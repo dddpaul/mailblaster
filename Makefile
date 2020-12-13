@@ -10,6 +10,9 @@ build:
 debug: build
 	@docker run -it --entrypoint=sh ${IMAGE}
 
+help: build
+	@docker run --rm --name mailblaster ${IMAGE} -h
+
 run: build
 	@docker run --rm --name mailblaster ${IMAGE}
 
