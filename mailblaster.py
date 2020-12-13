@@ -44,6 +44,9 @@ try:
         lines += 1
         logging.debug(f"{lines}: Mail to = {mail_to}, subject = {subject}")
 
+        for ill in ["\n", "\r"]:
+            subject = subject.replace(ill, ' ')
+
         headers = {
             "Content-Type": "text/plain; charset=utf-8",
             "Content-Disposition": "inline",
