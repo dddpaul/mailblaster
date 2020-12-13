@@ -7,7 +7,7 @@ import logging
 import csv
 import sys
 
-log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-4d %(levelname)-5s - %(message)s'}
+log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
 
 parser = OptionParser()
 parser.add_option("-v", dest="verbose", action="store_true", default=False,
@@ -40,9 +40,9 @@ try:
 
     server.login(smtp_user, smtp_password)
 
-    for fullname, email, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
+    for email, subject, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines = lines + 1
-        logging.debug("%d: fullname = %s, email = %s, message = %s" % (lines, fullname, email, message))
+        logging.debug("%d: Email = %s, subhect = %s, message = %s" % (lines, email, subject, message))
         try:
             server.sendmail(opt.mail_from, email, message)
             sent = sent + 1
@@ -50,9 +50,10 @@ try:
             logging.error(e)
 
 except Exception as e:
-    print(e)
+    logging.error(e)
 
 finally:
-    server.quit()
+    if server:
+        server.quit()
 
 logging.info("Lines parsed: %d, emails sent: %d" % (lines, sent))
