@@ -1,11 +1,10 @@
 #!/usr/bin/python
 # coding=utf-8
-
-from optparse import OptionParser
-import smtplib
-import logging
 import csv
+import logging
+import smtplib
 import sys
+from optparse import OptionParser
 
 log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
 
@@ -41,12 +40,26 @@ try:
         (smtp_user, smtp_password) = opt.smtp_auth.split(":")
         server.login(smtp_user, smtp_password)
 
-    for email, subject, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
-        lines = lines + 1
-        logging.debug(f"{lines}: Email = {email}, subject = {subject}, message = {message}")
-        message = f"Subject: {subject}\nFrom: {opt.mail_from}\nTo: {email}\n\n{message}"
+    for mail_to, subject, content in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
+        lines += 1
+        logging.debug(f"{lines}: Mail to = {mail_to}, subject = {subject}")
+
+        headers = {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Content-Disposition": "inline",
+            "Content-Transfer-Encoding": "8bit",
+            "From": opt.mail_from,
+            "To": mail_to,
+            "Subject": subject
+        }
+
+        message = ""
+        for key, value in headers.items():
+            message += f"{key}: {value}\n"
+        message += f"\n{content}\n"
+
         try:
-            server.sendmail(opt.mail_from, email, message)
+            server.sendmail(opt.mail_from, mail_to, message.encode("utf8"))
             sent = sent + 1
         except smtplib.SMTPException as e:
             logging.error(e)
