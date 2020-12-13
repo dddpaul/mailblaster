@@ -21,7 +21,7 @@ test-prep:
 	@docker run -d --rm --name exim-sender --net mailblaster -e PRIMARY_HOST=mx.dddpaul.pw -e SMTP_PORTS=25 -e ALLOWED_HOSTS=mailblaster dddpaul/exim-sender:1.3
 
 test: build
-	echo "dddpaul@gmail.com;Greetings from old friend;Hi, can you borrow some money?" | \
+	echo "dddpaul@gmail.com;Greetings from old friend;\"Hi!\n\nCan you borrow some money?\n\nYour friend\"" | \
 	docker run --rm -i --net mailblaster --name mailblaster ${IMAGE} -v \
 	-s exim-sender:25 \
 	-f "Pavel Derendyaev <dddpaul@gmail.com>"
