@@ -24,7 +24,7 @@ test: build
 	echo "dddpaul@gmail.com;Greetings from old friend;Hi, can you borrow some money?" | \
 	docker run --rm -i --net mailblaster --name mailblaster ${IMAGE} -v \
 	-s exim-sender:25 \
-	-f dddpaul@gmail.com
+	-f "Pavel Derendyaev <dddpaul@gmail.com>"
 
 release: build
 	@echo "Tag image with version $(version)"

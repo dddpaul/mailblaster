@@ -44,7 +44,7 @@ try:
     for email, subject, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines = lines + 1
         logging.debug(f"{lines}: Email = {email}, subject = {subject}, message = {message}")
-        message = f"Subject: {subject}\n\n{message}"
+        message = f"Subject: {subject}\nFrom: {opt.mail_from}\nTo: {email}\n\n{message}"
         try:
             server.sendmail(opt.mail_from, email, message)
             sent = sent + 1
