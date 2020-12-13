@@ -5,6 +5,7 @@ import logging
 import smtplib
 import sys
 from optparse import OptionParser
+from string import Template
 
 log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
 
@@ -16,6 +17,7 @@ parser.add_option("-t", dest="tls", action="store_true", default=False,
 parser.add_option("-s", dest="smtp_server", help="SMTP server with port, colon delimited")
 parser.add_option("-a", dest="smtp_auth", help="SMTP auth user and password, colon delimited")
 parser.add_option("-f", dest="mail_from", help="Sender address, for example, \"John Smith <john@smith.com>\"")
+parser.add_option("-m", dest="message_template", help="Message template filename")
 (opt, arg) = parser.parse_args()
 
 if opt.verbose:
@@ -40,9 +42,12 @@ try:
         (smtp_user, smtp_password) = opt.smtp_auth.split(":")
         server.login(smtp_user, smtp_password)
 
-    for mail_to, subject, content in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
+    with open(opt.message_template, "r") as f:
+        template = f.read()
+
+    for mail_to, subject, placeholder1 in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines += 1
-        logging.debug(f"{lines}: Mail to = {mail_to}, subject = {subject}")
+        logging.debug(f"{lines}: Mail to = {mail_to}, subject = {subject}, placeholder1 = {placeholder1}")
 
         for ill in ["\n", "\r"]:
             subject = subject.replace(ill, ' ')
@@ -59,6 +64,8 @@ try:
         message = ""
         for key, value in headers.items():
             message += f"{key}: {value}\n"
+
+        content = Template(template).substitute(placeholder1=placeholder1)
         message += f"\n{content}\n"
 
         try:
