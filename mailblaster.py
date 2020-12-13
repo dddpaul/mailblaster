@@ -23,7 +23,7 @@ if opt.verbose:
     log_config["level"] = logging.DEBUG
 logging.basicConfig(**log_config)
 
-logging.info("Options: %s" % opt)
+logging.info(f"Options: {opt}")
 
 (smtp_server, port) = opt.smtp_server.split(":")
 
@@ -43,7 +43,8 @@ try:
 
     for email, subject, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines = lines + 1
-        logging.debug("%d: Email = %s, subject = %s, message = %s" % (lines, email, subject, message))
+        logging.debug(f"{lines}: Email = {email}, subject = {subject}, message = {message}")
+        message = f"Subject: {subject}\n\n{message}"
         try:
             server.sendmail(opt.mail_from, email, message)
             sent = sent + 1
@@ -57,4 +58,4 @@ finally:
     if server:
         server.quit()
 
-logging.info("Lines parsed: %d, emails sent: %d" % (lines, sent))
+logging.info(f"Lines parsed: {lines}, emails sent: {sent}")
