@@ -4,6 +4,7 @@ import csv
 import logging
 import smtplib
 import sys
+from email.header import Header
 from optparse import OptionParser
 from string import Template
 
@@ -49,16 +50,13 @@ try:
         lines += 1
         logging.debug(f"{lines}: Mail to = {mail_to}, subject = {subject}, placeholder1 = {placeholder1}")
 
-        for ill in ["\n", "\r"]:
-            subject = subject.replace(ill, ' ')
-
         headers = {
             "Content-Type": "text/plain; charset=utf-8",
             "Content-Disposition": "inline",
             "Content-Transfer-Encoding": "8bit",
             "From": opt.mail_from,
             "To": mail_to,
-            "Subject": subject
+            "Subject": Header(subject, 'utf-8').encode()
         }
 
         message = ""
