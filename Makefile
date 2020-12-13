@@ -16,11 +16,14 @@ help: build
 run: build
 	@docker run --rm --name mailblaster ${IMAGE}
 
+test-prep:
+	-@docker network create mailblaster
+	@docker run -d --rm --name exim-sender --net mailblaster -e PRIMARY_HOST=mx.dddpaul.pw -e SMTP_PORTS=25 -e ALLOWED_HOSTS=mailblaster dddpaul/exim-sender:1.3
+
 test: build
 	echo "dddpaul@gmail.com;Greetings from old friend;Hi, can you borrow some money?" | \
-	docker run --rm --name mailblaster ${IMAGE} \
-	-s 127.0.0.1:25 \
-	-a user:pass \
+	docker run --rm -i --net mailblaster --name mailblaster ${IMAGE} \
+	-s exim-sender:25 \
 	-f dddpaul@gmail.com
 
 release: build

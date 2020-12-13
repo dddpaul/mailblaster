@@ -26,7 +26,6 @@ logging.basicConfig(**log_config)
 logging.info("Options: %s" % opt)
 
 (smtp_server, port) = opt.smtp_server.split(":")
-(smtp_user, smtp_password) = opt.smtp_auth.split(":")
 
 lines = 0
 sent = 0
@@ -38,11 +37,13 @@ try:
     else:
         server = smtplib.SMTP(smtp_server, port)
 
-    server.login(smtp_user, smtp_password)
+    if opt.smtp_auth:
+        (smtp_user, smtp_password) = opt.smtp_auth.split(":")
+        server.login(smtp_user, smtp_password)
 
     for email, subject, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines = lines + 1
-        logging.debug("%d: Email = %s, subhect = %s, message = %s" % (lines, email, subject, message))
+        logging.debug("%d: Email = %s, subject = %s, message = %s" % (lines, email, subject, message))
         try:
             server.sendmail(opt.mail_from, email, message)
             sent = sent + 1
