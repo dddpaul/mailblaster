@@ -3,14 +3,11 @@
 
 from optparse import OptionParser
 import smtplib
-import ssl
 import logging
 import csv
 import sys
-import time
 
-log_config = dict(level=logging.INFO,
-                    format='%(asctime)s %(filename)s:%(funcName)-12s:%(lineno)-4d %(levelname)-7s - %(message)s')
+log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-4d %(levelname)-5s - %(message)s'}
 
 parser = OptionParser()
 parser.add_option("-v", dest="verbose", action="store_true", default=False,
@@ -31,6 +28,10 @@ logging.info("Options: %s" % opt)
 (smtp_server, port) = opt.smtp_server.split(":")
 (smtp_user, smtp_password) = opt.smtp_auth.split(":")
 
+lines = 0
+sent = 0
+server = None
+
 try:
     if opt.tls:
         server = smtplib.SMTP_SSL(smtp_server, port)
@@ -39,8 +40,6 @@ try:
 
     server.login(smtp_user, smtp_password)
 
-    lines = 0
-    sent = 0
     for fullname, email, message in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines = lines + 1
         logging.debug("%d: fullname = %s, email = %s, message = %s" % (lines, fullname, email, message))
