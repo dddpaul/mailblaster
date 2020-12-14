@@ -57,3 +57,7 @@ Options:
   --ssl                 Turns on TLS/SSL mode, default is off
   -v, --verbose         Turns on verbose mode, default is off
 ```
+
+Great articles used to write this code:
+* [Sending Emails With Python](https://realpython.com/python-send-email/)
+* [How to send simple UTF-8 email in Python 3.x](https://petermolnar.net/article/not-mime-email-python-3/)
