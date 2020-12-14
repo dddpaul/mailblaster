@@ -35,6 +35,7 @@ logging.info(f"Options: {opt}")
 server = None
 lines = 0
 sent = 0
+failed = 0
 
 try:
     if opt.ssl:
@@ -71,9 +72,10 @@ try:
 
         try:
             server.sendmail(opt.mail_from, mail_to, message.encode("utf8"))
-            sent = sent + 1
+            sent += 1
         except smtplib.SMTPException as e:
             logging.error(e)
+            failed += 1
 
 except Exception as e:
     logging.error(e)
@@ -82,4 +84,4 @@ finally:
     if server:
         server.quit()
 
-logging.info(f"Lines parsed: {lines}, emails sent: {sent}")
+logging.info(f"Lines parsed: {lines}, messages sent: {sent}, messages failed: {failed}")
