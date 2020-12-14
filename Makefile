@@ -13,9 +13,6 @@ debug: build
 help: build
 	@docker run --rm --name mailblaster ${IMAGE} -h
 
-run: build
-	@docker run --rm --name mailblaster ${IMAGE}
-
 test-prep:
 	-@docker network create mailblaster
 	@docker run -d --rm --name exim-sender --net mailblaster -e PRIMARY_HOST=mx.dddpaul.pw -e SMTP_PORTS=25 -e ALLOWED_HOSTS=mailblaster dddpaul/exim-sender:1.3
