@@ -8,8 +8,6 @@ from email.header import Header
 from optparse import OptionParser
 from string import Template
 
-log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
-
 parser = OptionParser()
 parser.add_option("--server", dest="smtp_server", help="SMTP server with port, colon delimited (required)")
 parser.add_option("--auth", dest="smtp_auth", help="SMTP auth user and password, colon delimited")
@@ -27,17 +25,16 @@ if not opt.smtp_server or not opt.subject or not opt.mail_from or not opt.templa
     parser.print_help()
     parser.error("Missing required options")
 
+log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
 if opt.verbose:
     log_config["level"] = logging.DEBUG
 logging.basicConfig(**log_config)
-
 logging.info(f"Options: {opt}")
 
 (smtp_server, port) = opt.smtp_server.split(":")
-
+server = None
 lines = 0
 sent = 0
-server = None
 
 try:
     if opt.ssl:

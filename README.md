@@ -1,7 +1,5 @@
 # Mail sender written in Python
 
-## Instructions
-
 ### Building
 
 ```bash
