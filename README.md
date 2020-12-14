@@ -28,7 +28,13 @@ This script expects CSV data to standard input (STDIN). CSV format is `email,pla
 Then `$placeholder1` in the template will be substituted with `placeholder1` value from CSV.
 
 ```bash
-echo "dddpaul@gmail.com,greeting" | ./mailplaster.py [options]
+echo "dddpaul@gmail.com,greeting" | \
+docker run --rm -i --name mailblaster -v ${PWD}/template.txt:/app/template.txt dddpaul/mailblaster:latest \
+	--verbose \
+	--server 127.0.0.1:25 \
+	--from "Pavel Derendyaev <dddpaul@gmail.com>" \
+	--subject "Hi!" \
+	--template /app/template.txt
 ```
 
 ### Configuration
