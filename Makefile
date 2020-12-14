@@ -24,6 +24,7 @@ test: build
 	echo "dddpaul@gmail.com;Пожалуйста!" | \
 	docker run --rm -i --net mailblaster --name mailblaster -v ${PWD}/test-template.txt:/app/template.txt ${IMAGE} \
 	--verbose \
+	--delimiter ";" \
 	--server exim-sender:25 \
 	--from "Pavel Derendyaev <dddpaul@gmail.com>" \
 	--subject "Greetings from old русский friend" \

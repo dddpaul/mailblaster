@@ -16,6 +16,7 @@ parser.add_option("--auth", dest="smtp_auth", help="SMTP auth user and password,
 parser.add_option("--from", dest="mail_from", help="Sender address e.g. \"John Smith <john@smith.com>\" (required)")
 parser.add_option("--subject", dest="subject", help="Message subject (required)")
 parser.add_option("--template", dest="template", help="Message template filename (required)")
+parser.add_option("--delimiter", dest="delimiter", default=",", help="CSV delimiter, default is \",\"")
 parser.add_option("--ssl", dest="ssl", action="store_true", default=False,
                   help="Turns on TLS/SSL mode, default is off")
 parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
@@ -51,7 +52,7 @@ try:
     with open(opt.template, "r") as f:
         template = f.read()
 
-    for mail_to, placeholder1 in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
+    for mail_to, placeholder1 in csv.reader(iter(sys.stdin.readline, ''), delimiter=opt.delimiter):
         lines += 1
         logging.debug(f"{lines}: Mail to = {mail_to}, subject = {opt.subject}, placeholder1 = {placeholder1}")
 
