@@ -21,12 +21,13 @@ test-prep:
 	@docker run -d --rm --name exim-sender --net mailblaster -e PRIMARY_HOST=mx.dddpaul.pw -e SMTP_PORTS=25 -e ALLOWED_HOSTS=mailblaster dddpaul/exim-sender:1.3
 
 test: build
-	echo "dddpaul@gmail.com;Greetings from old русский friend;Пожалуйста!" | \
+	echo "dddpaul@gmail.com;Пожалуйста!" | \
 	docker run --rm -i --net mailblaster --name mailblaster -v ${PWD}/test-template.txt:/app/template.txt ${IMAGE} \
-	-v \
-	-s exim-sender:25 \
-	-f "Pavel Derendyaev <dddpaul@gmail.com>" \
-	-m /app/template.txt
+	--verbose \
+	--server exim-sender:25 \
+	--from "Pavel Derendyaev <dddpaul@gmail.com>" \
+	--subject "Greetings from old русский friend" \
+	--template /app/template.txt
 
 release: build
 	@echo "Tag image with version $(version)"

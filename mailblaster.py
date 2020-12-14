@@ -11,15 +11,20 @@ from string import Template
 log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
 
 parser = OptionParser()
-parser.add_option("-v", dest="verbose", action="store_true", default=False,
-                  help="Turns on verbose mode, default is off")
-parser.add_option("-t", dest="tls", action="store_true", default=False,
+parser.add_option("--server", dest="smtp_server", help="SMTP server with port, colon delimited (required)")
+parser.add_option("--auth", dest="smtp_auth", help="SMTP auth user and password, colon delimited")
+parser.add_option("--from", dest="mail_from", help="Sender address e.g. \"John Smith <john@smith.com>\" (required)")
+parser.add_option("--subject", dest="subject", help="Message subject (required)")
+parser.add_option("--template", dest="template", help="Message template filename (required)")
+parser.add_option("--ssl", dest="ssl", action="store_true", default=False,
                   help="Turns on TLS/SSL mode, default is off")
-parser.add_option("-s", dest="smtp_server", help="SMTP server with port, colon delimited")
-parser.add_option("-a", dest="smtp_auth", help="SMTP auth user and password, colon delimited")
-parser.add_option("-f", dest="mail_from", help="Sender address, for example, \"John Smith <john@smith.com>\"")
-parser.add_option("-m", dest="message_template", help="Message template filename")
+parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
+                  help="Turns on verbose mode, default is off")
 (opt, arg) = parser.parse_args()
+
+if not opt.smtp_server or not opt.subject or not opt.mail_from or not opt.template:
+    parser.print_help()
+    parser.error("Missing required options")
 
 if opt.verbose:
     log_config["level"] = logging.DEBUG
@@ -34,7 +39,7 @@ sent = 0
 server = None
 
 try:
-    if opt.tls:
+    if opt.ssl:
         server = smtplib.SMTP_SSL(smtp_server, port)
     else:
         server = smtplib.SMTP(smtp_server, port)
@@ -43,12 +48,12 @@ try:
         (smtp_user, smtp_password) = opt.smtp_auth.split(":")
         server.login(smtp_user, smtp_password)
 
-    with open(opt.message_template, "r") as f:
+    with open(opt.template, "r") as f:
         template = f.read()
 
-    for mail_to, subject, placeholder1 in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
+    for mail_to, placeholder1 in csv.reader(iter(sys.stdin.readline, ''), delimiter=';'):
         lines += 1
-        logging.debug(f"{lines}: Mail to = {mail_to}, subject = {subject}, placeholder1 = {placeholder1}")
+        logging.debug(f"{lines}: Mail to = {mail_to}, subject = {opt.subject}, placeholder1 = {placeholder1}")
 
         headers = {
             "Content-Type": "text/plain; charset=utf-8",
@@ -56,7 +61,7 @@ try:
             "Content-Transfer-Encoding": "8bit",
             "From": opt.mail_from,
             "To": mail_to,
-            "Subject": Header(subject, 'utf-8').encode()
+            "Subject": Header(opt.subject, 'utf-8').encode()
         }
 
         message = ""
