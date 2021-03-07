@@ -4,26 +4,20 @@ import csv
 import logging
 import smtplib
 import sys
+import argparse
 from email.header import Header
-from optparse import OptionParser
 from string import Template
 
-parser = OptionParser()
-parser.add_option("--server", dest="smtp_server", help="SMTP server with port, colon delimited (required)")
-parser.add_option("--auth", dest="smtp_auth", help="SMTP auth user and password, colon delimited")
-parser.add_option("--from", dest="mail_from", help="Sender address e.g. \"John Smith <john@smith.com>\" (required)")
-parser.add_option("--subject", dest="subject", help="Message subject (required)")
-parser.add_option("--template", dest="template", help="Message template filename (required)")
-parser.add_option("--delimiter", dest="delimiter", default=",", help="CSV delimiter, default is \",\"")
-parser.add_option("--ssl", dest="ssl", action="store_true", default=False,
-                  help="Turns on TLS/SSL mode, default is off")
-parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
-                  help="Turns on verbose mode, default is off")
-(opt, arg) = parser.parse_args()
-
-if not opt.smtp_server or not opt.subject or not opt.mail_from or not opt.template:
-    parser.print_help()
-    parser.error("Missing required options")
+parser = argparse.ArgumentParser()
+parser.add_argument("--server", dest="smtp_server", required=True, help="SMTP server with port, colon delimited (required)")
+parser.add_argument("--auth", dest="smtp_auth", help="SMTP auth user and password, colon delimited")
+parser.add_argument("--from", dest="mail_from", required=True, help="Sender address e.g. \"John Smith <john@smith.com>\" (required)")
+parser.add_argument("--subject", required=True, help="Message subject (required)")
+parser.add_argument("--template", required=True, help="Message template filename (required)")
+parser.add_argument("--delimiter", default=",", help="CSV delimiter, default is \",\"")
+parser.add_argument("--ssl", action="store_true", default=False, help="Turns on TLS/SSL mode, default is off")
+parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Turns on verbose mode, default is off")
+opt = parser.parse_args()
 
 log_config = {'level': logging.INFO, 'format': '%(asctime)s %(filename)s:%(lineno)-2d %(levelname)-5s - %(message)s'}
 if opt.verbose:
